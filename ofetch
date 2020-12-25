@@ -1,0 +1,92 @@
+#! /usr/bin/env python
+#
+# ofetch is a simple cli system information tool inspired by pfetch, neofetch
+
+# Import Modules
+import subprocess, os, distro, argparse
+
+# Trying to import psutil module
+try:
+  import psutil
+# If not found, install module
+except ImportError:
+  print("'psutil' not found, trying to install module")
+  os.system('python -m pip install psutil')
+
+######## INFORMATION ########
+VERSION = '1.4'
+DEFAULT = 'K,O,U,P,R,D,M'
+
+######## COLORS ########
+nC = '\u001b[37;1m' # - Name color
+fC = '\u001b[36;1m' # - Foreground color
+bP = '\u001b[46m  ' # - Background color
+sP = '\u001b[47m  ' # - Start background color
+RST = '\u001b[0m'   # - Reset color
+
+######## Get System Information ########
+OS = os.uname() 
+KERNEL = f'{OS[0]} {OS[2]}' # - Getting kernel name(os[o]) and version(os[2]) using the 'os' module
+DISTRO = distro.linux_distribution() # - Getting linux distro using the 'distro' module
+HOST = OS[1] # - Getting hostname(os[1]) using the 'os' module
+USER = os.environ.get('USER') # - Getting current user using the environment variable $USER
+
+### Memory and Disk ###
+MEM = int(psutil.virtual_memory().total / (1024 ** 2)) # - Getting the total amount of memory using the 'psutil' module in MiB
+FMEM = int(psutil.virtual_memory().available / (1024 ** 2)) # - Getting the available amount of memory using the 'psutil' module in MiB
+UMEM = int(psutil.virtual_memory().used / (1024 ** 2)) # - Getting the used amount of memory using the 'psutil' module in MiB
+DISK = int(psutil.disk_usage('/').total / (1024 ** 3)) # - Getting the total size of disk using the 'psutil' module in GB
+FDISK = int(psutil.disk_usage('/').free / (1024 ** 3)) # - Getting the free size of disk using the 'psutil' module in GB
+UDISK = int(psutil.disk_usage('/').used / (1024 ** 3)) # - Getting the used size of disk using the 'psutil' module in GB
+
+### Getting number of packages using pacman ###
+PKGS = subprocess.Popen("pacman -Q | wc -l", shell=True, stdout=subprocess.PIPE, universal_newlines=True).communicate()[0].strip()
+
+### Getting screen resolution using xrandr ###
+RES = subprocess.check_output("xrandr | fgrep '*'", shell=True, universal_newlines=True).strip().split()[0]
+
+### Getting uptime from /proc/uptime ###
+UPTIME = float(subprocess.check_output('cat /proc/uptime', shell=True, universal_newlines=True).strip().split()[0])
+UPTIMED = int(UPTIME / 60 / 60 / 24) # - Convert uptime from seconds to days
+UPTIMEH = int(UPTIME / 60 / 60) # - Convert uptime from seconds to hours
+
+  
+######## ARGPARSE ########
+parser = argparse.ArgumentParser(description='Simple system info tool written in python',
+  epilog="Avaialabe Filter options: (KERNEL, OS, UPTIME, PKGS, RES, DISK, MEM)")
+
+parser.version = VERSION
+parser.add_argument('-f', '--filter', type=str, help='Filter options Example=[-f K,O,U,P]', default=DEFAULT)
+parser.add_argument('-v', '--version', help='Print version', action='version')
+
+args = parser.parse_args()
+
+######## System Information ########
+sys_info = {
+  'IGNOREN': f'{nC}{USER}{RST} in{nC} {HOST}',
+  'IGNOREL':f'{"-" * len(f"{USER} in {HOST}")}',
+  'K': f'{fC}KERN{RST}   {KERNEL}',
+  'O':   f'{fC}OS{RST}     {DISTRO}',
+  'U':   f'{fC}UP{RST}     {UPTIMED} Days or {UPTIMEH} Hrs',
+  'P': f'{fC}PKGS{RST}   {PKGS} Packages',
+  'R':  f'{fC}RES{RST}    {RES}',
+  'D': f'{fC}DISK{RST}   {DISK}GB using {UDISK}GB ({int(FDISK / DISK * 100)}% left)',
+  'M':  f'{fC}MEM{RST}    {MEM}MiB using {UMEM}MiB ({FMEM}MiB){RST}'
+}
+
+art = f'{sP}{bP}{bP}{bP}{RST}'
+
+######## Print System Information ########
+def print_info(): 
+  opts = args.filter.split(',') # - convert the '-f' flag to a list
+  opts = ['IGNOREN', 'IGNOREL'] + opts # - add the name and the line at the start
+  
+  print()
+  for i in opts:
+    if i.upper() in sys_info.keys():
+      print(f'  {art}    ', end='')
+      print(sys_info[i.upper()])
+  print()
+
+print_info()
+
