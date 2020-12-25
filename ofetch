@@ -53,7 +53,7 @@ UPTIMEH = int(UPTIME / 60 / 60) # - Convert uptime from seconds to hours
   
 ######## ARGPARSE ########
 parser = argparse.ArgumentParser(description='Simple system info tool written in python',
-  epilog="Avaialabe Filter options: (KERNEL, OS, UPTIME, PKGS, RES, DISK, MEM)")
+  epilog="Available Filter options: (KERNEL, OS, UPTIME, PKGS, RES, DISK, MEM)")
 
 parser.version = VERSION
 parser.add_argument('-f', '--filter', type=str, help='Filter options Example=[-f K,O,U,P]', default=DEFAULT)
