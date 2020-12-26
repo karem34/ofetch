@@ -1,7 +1,7 @@
 ## ofetch
 a simple personal CLI system information tool written in python.
 
-<a href="./LICENSE.md"><img src="https://img.shields.io/github/license/karem34/ofetc"></a>
+<a href="./LICENSE.md"><img src="https://img.shields.io/github/license/karem34/ofetch"></a>
 
 
 ![screenshot](https://github.com/karem34/ofetch/blob/main/screenshot.png?raw=true "screenshot")
