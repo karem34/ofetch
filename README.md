@@ -1,5 +1,6 @@
 ## ofetch
-a simple personal CLI system information tool written in python.
+a simple and slow personal CLI system information tool written in python 
+made for leaning purposes.
 
 <a href="./LICENSE"><img src="https://img.shields.io/github/license/karem34/ofetch"></a>
 
