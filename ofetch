@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 #
-# ofetch is a simple cli system information tool inspired by pfetch, neofetch
+# ofetch is a simple cli system information tool inspired by pfetch, neofetch made for learning purposes
 
 # Import Modules
 import subprocess, os, distro, argparse
@@ -14,7 +14,7 @@ except ImportError:
   os.system('python -m pip install psutil')
 
 ######## INFORMATION ########
-VERSION = '1.4'
+VERSION = '1.7'
 DEFAULT = 'K,O,U,P,R,D,M'
 
 ######## COLORS ########
@@ -24,20 +24,27 @@ bP = '\u001b[46m  ' # - Background color
 sP = '\u001b[47m  ' # - Start background color
 RST = '\u001b[0m'   # - Reset color
 
-######## Get System Information ########
-OS = os.uname() 
-KERNEL = f'{OS[0]} {OS[2]}' # - Getting kernel name(os[o]) and version(os[2]) using the 'os' module
-DISTRO = distro.linux_distribution() # - Getting linux distro using the 'distro' module
-HOST = OS[1] # - Getting hostname(os[1]) using the 'os' module
-USER = os.environ.get('USER') # - Getting current user using the environment variable $USER
+def get_sysinf():
+  ######## Get System Information ########
+  OS = os.uname() 
+  KERNEL = f'{OS[0]} {OS[2]}' # - Getting kernel name(os[o]) and version(os[2]) using the 'os' module
+  DISTRO = distro.linux_distribution() # - Getting linux distro using the 'distro' module
+  HOST = OS[1] # - Getting hostname(os[1]) using the 'os' module
+  USER = os.environ.get('USER') # - Getting current user using the environment variable $USER
+  return [OS, KERNEL, DISTRO, HOST, USER]
 
-### Memory and Disk ###
-MEM = int(psutil.virtual_memory().total / (1024 ** 2)) # - Getting the total amount of memory using the 'psutil' module in MiB
-FMEM = int(psutil.virtual_memory().available / (1024 ** 2)) # - Getting the available amount of memory using the 'psutil' module in MiB
-UMEM = int(psutil.virtual_memory().used / (1024 ** 2)) # - Getting the used amount of memory using the 'psutil' module in MiB
-DISK = int(psutil.disk_usage('/').total / (1024 ** 3)) # - Getting the total size of disk using the 'psutil' module in GB
-FDISK = int(psutil.disk_usage('/').free / (1024 ** 3)) # - Getting the free size of disk using the 'psutil' module in GB
-UDISK = int(psutil.disk_usage('/').used / (1024 ** 3)) # - Getting the used size of disk using the 'psutil' module in GB
+OS, KERNEL, DISTRO, HOST, USER = get_sysinf()
+
+def get_sysres():
+  MEM = int(psutil.virtual_memory().total / (1024 ** 2)) # - Getting the total amount of memory using the 'psutil' module in MiB
+  FMEM = int(psutil.virtual_memory().available / (1024 ** 2)) # - Getting the available amount of memory using the 'psutil' module in MiB
+  UMEM = int(psutil.virtual_memory().used / (1024 ** 2)) # - Getting the used amount of memory using the 'psutil' module in MiB
+  DISK = int(psutil.disk_usage('/').total / (1024 ** 3)) # - Getting the total size of disk using the 'psutil' module in GB
+  FDISK = int(psutil.disk_usage('/').free / (1024 ** 3)) # - Getting the free size of disk using the 'psutil' module in GB
+  UDISK = int(psutil.disk_usage('/').used / (1024 ** 3)) # - Getting the used size of disk using the 'psutil' module in GB
+  return [MEM, FMEM, UMEM, DISK, FDISK, UDISK]
+  
+MEM, FMEM, UMEM, DISK, FDISK, UDISK = get_sysres()
 
 ### Getting number of packages using pacman ###
 PKGS = subprocess.Popen("pacman -Q | wc -l", shell=True, stdout=subprocess.PIPE, universal_newlines=True).communicate()[0].strip()
@@ -89,4 +96,3 @@ def print_info():
   print()
 
 print_info()
-
